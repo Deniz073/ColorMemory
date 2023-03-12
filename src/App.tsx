@@ -5,7 +5,6 @@ import Button from './components/Button';
 
 
 const STEP_VALUES = ['red', 'green', 'blue', 'yellow'];
-const ANIMATION_DURATION_MS = 1000;
 const STEP_DELAY_MS = 1000;
 
 type Color = 'red' | 'green' | 'blue' | 'yellow';
@@ -24,11 +23,18 @@ function App() {
     yellow: useRef<HTMLButtonElement>(null),
   };
 
+  const handleAnimation = (ref: React.RefObject<HTMLButtonElement>) => {
+    if (!ref.current) return;
+    ref.current.classList.remove('animate__pulse');
+    ref.current.offsetWidth;
+    ref.current.classList.add('animate__pulse');
+  }
+
   const handleClick = (color: Color) => {
-    const ref = buttonRefs[color].current;
+    const ref = buttonRefs[color];
     if (!ref) return; 
 
-    ref.classList.add('animate__pulse');
+    handleAnimation(ref)
     new Audio(`./sounds/${color}.mp3`).play();
 
     if (color !== steps[currentSteps.length]) {
@@ -50,10 +56,6 @@ function App() {
         setCurrentSteps([]);
       }, STEP_DELAY_MS);
     }
-
-    setTimeout(() => {
-      ref.classList.remove('animate__pulse');
-    }, ANIMATION_DURATION_MS);
   };
 
   const addRandomStep = (gameOver: boolean) => {
@@ -64,15 +66,12 @@ function App() {
     if (newSteps.length > 0) {
       setDisabled(true);
       newSteps.forEach((step, index) => {
-        const ref = buttonRefs[step].current;
+        const ref = buttonRefs[step];
         if (!ref) return;
 
         setTimeout(() => {
-          ref.classList.add('animate__pulse');
+          handleAnimation(ref);
           new Audio(`./sounds/${step}.mp3`).play();
-          setTimeout(() => {
-            ref.classList.remove('animate__pulse');
-          }, ANIMATION_DURATION_MS);
         }, index * STEP_DELAY_MS);
       });
 
@@ -86,13 +85,10 @@ function App() {
     setGameStarted(true);
     setGameOver(false);
     if (steps.length > 0) {
-      const ref = buttonRefs[steps[0]].current;
+      const ref = buttonRefs[steps[0]];
       if (ref) {
-        ref.classList.add('animate__pulse');
+        handleAnimation(ref);
         new Audio(`./sounds/${steps[0]}.mp3`).play();
-        setTimeout(() => {
-          ref.classList.remove('animate__pulse');
-        }, ANIMATION_DURATION_MS);
       }
     }
   };
@@ -114,7 +110,7 @@ function App() {
       {
         gameOver && <p className="text-xl font-bold text-red-700 mt-4">Game Over</p>
       }
-      <button disabled={gameStarted} className='bg-blue-500 hover:bg-blue-700 disabled:opacity-30 text-white font-bold py-2 px-4 rounded mt-4' onClick={startGame}>Start</button>
+      <button disabled={gameStarted} className='bg-blue-500 hover:bg-blue-700 disabled:opacity-30 text-white font-bold py-2 px-4 rounded mt-4' onClick={startGame}>EREN</button>
       <div className="flex flex-row">
         <p className="font-bold text-gray-700 mt-4 mr-4">Highscore: {localStorage.getItem('highscore') ?? '0'}</p>
         <p className="font-bold text-gray-700 mt-4">Current round: {steps.length}</p>
